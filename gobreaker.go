@@ -10,8 +10,8 @@ var (
 	fps int32 = 60
 
 	playerPos    int32 = 10
-	playerSpeed  int32 = 500
-	playerHeight int32 = 50
+	playerSpeed  int32 = 700
+	playerHeight int32 = 10
 	playerWidth  int32 = 100
 
 	ballX     float32 = 10
@@ -31,13 +31,8 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		renderPlayer()
-
-		renderBall()
-
-		updateBall()
-
-		getPlayerInput()
+		update()
+		render()
 
 		rl.EndDrawing()
 	}
@@ -45,7 +40,17 @@ func main() {
 	rl.CloseWindow()
 }
 
-func getPlayerInput() {
+func update() {
+	updateBall()
+	updatePlayer()
+}
+
+func render() {
+	renderPlayer()
+	renderBall()
+}
+
+func updatePlayer() {
 	if rl.IsKeyDown(rl.KeyRight) {
 		playerPos += int32(float32(playerSpeed) * rl.GetFrameTime())
 	}
@@ -74,5 +79,4 @@ func updateBall() {
 	if ballY >= float32(windowHeight) || ballY <= float32(0) {
 		ballYVel = -ballYVel
 	}
-
 }
