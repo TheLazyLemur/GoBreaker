@@ -1,6 +1,23 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
+
+type brick struct {
+	height int32
+	width  int32
+	xPos   int32
+	yPos   int32
+	alive  bool
+}
+
+type player struct {
+	playerPos int32
+	speed     int32
+	height    int32
+	width     int32
+}
 
 var (
 	windowName   string = "Go Breaker"
@@ -14,11 +31,42 @@ var (
 	playerHeight int32 = 10
 	playerWidth  int32 = 100
 
-	ballX     float32 = 10
-	ballY     float32 = 10
+	ballX     float32 = 50
+	ballY     float32 = 50
 	ballXVel  float32 = 1
 	ballYVel  float32 = 1
-	ballSpeed float32 = 500
+	ballSpeed float32 = 250
+
+	targets = []brick{
+		{
+			height: 20,
+			width:  50,
+			xPos:   0,
+			yPos:   0,
+			alive:  true,
+		},
+		{
+			height: 20,
+			width:  50,
+			xPos:   55,
+			yPos:   0,
+			alive:  true,
+		},
+		{
+			height: 20,
+			width:  50,
+			xPos:   110,
+			yPos:   0,
+			alive:  true,
+		},
+		{
+			height: 20,
+			width:  50,
+			xPos:   165,
+			yPos:   0,
+			alive:  true,
+		},
+	}
 )
 
 func main() {
@@ -48,6 +96,7 @@ func update() {
 func render() {
 	renderPlayer()
 	renderBall()
+	renderTargets()
 }
 
 func updatePlayer() {
@@ -68,6 +117,14 @@ func renderBall() {
 	rl.DrawRectangle(int32(ballX), int32(ballY), 25, 25, rl.Purple)
 }
 
+func renderTargets() {
+	for _, target := range targets {
+		if target.alive == true {
+			rl.DrawRectangle(target.xPos, target.yPos, target.width, target.height, rl.Green)
+		}
+	}
+}
+
 func updateBall() {
 	ballX += ballXVel * ballSpeed * rl.GetFrameTime()
 	ballY += ballYVel * ballSpeed * rl.GetFrameTime()
@@ -76,7 +133,44 @@ func updateBall() {
 		ballXVel = -ballXVel
 	}
 
-	if ballY >= float32(windowHeight) || ballY <= float32(0) {
+	if ballY <= float32(0) {
 		ballYVel = -ballYVel
 	}
+
+	playerRec := rl.Rectangle{
+		Width:  float32(playerWidth),
+		Height: float32(playerHeight),
+		X:      float32(playerPos),
+		Y:      float32(windowHeight - playerHeight),
+	}
+
+	ballRec := rl.Rectangle{
+		Width:  25,
+		Height: 25,
+		X:      ballX,
+		Y:      ballY,
+	}
+
+	if ballY >= float32(windowHeight) {
+		rl.CloseWindow()
+	}
+
+	if rl.CheckCollisionRecs(playerRec, ballRec) {
+		ballYVel = -ballYVel
+	}
+
+	for i, target := range targets {
+		targetRec := rl.Rectangle{
+			Width:  25,
+			Height: 25,
+			X:      float32(target.xPos),
+			Y:      float32(target.yPos),
+		}
+
+		if rl.CheckCollisionRecs(targetRec, ballRec) && target.alive == true {
+			ballYVel = -ballYVel
+			targets[i].alive = false
+		}
+	}
+
 }
