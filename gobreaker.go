@@ -41,14 +41,7 @@ var (
 		{
 			height: 20,
 			width:  50,
-			xPos:   0,
-			yPos:   0,
-			alive:  true,
-		},
-		{
-			height: 20,
-			width:  50,
-			xPos:   55,
+			xPos:   50,
 			yPos:   0,
 			alive:  true,
 		},
@@ -66,6 +59,13 @@ var (
 			yPos:   0,
 			alive:  true,
 		},
+		{
+			height: 20,
+			width:  50,
+			xPos:   500,
+			yPos:   0,
+			alive:  true,
+		},
 	}
 )
 
@@ -77,7 +77,7 @@ func main() {
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 
-		rl.ClearBackground(rl.RayWhite)
+		rl.ClearBackground(rl.Black)
 
 		update()
 		render()
@@ -89,11 +89,21 @@ func main() {
 }
 
 func update() {
+	isGameOnGoing := false
+	for _, target := range targets {
+		if target.alive == true {
+			isGameOnGoing = true
+		}
+	}
+	if isGameOnGoing == false {
+		rl.CloseWindow()
+	}
 	updateBall()
 	updatePlayer()
 }
 
 func render() {
+
 	renderPlayer()
 	renderBall()
 	renderTargets()
